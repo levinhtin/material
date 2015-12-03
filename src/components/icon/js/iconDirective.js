@@ -182,8 +182,10 @@ function mdIconDirective($mdIcon, $mdTheming, $mdAria ) {
    */
   function postLink(scope, element, attr) {
     $mdTheming(element);
-
-    prepareForFontIcon();
+    var lastIcon = scope.fontIcon;
+    var lastSet = $mdIcon.fontSet(scope.fontSet);
+    attr.$observe('mdFontIcon', prepareForFontIcon);
+    attr.$observe('mdFontSet', prepareForFontIcon);
 
     // If using a font-icon, then the textual name of the icon itself
     // provides the aria-label.
@@ -234,9 +236,20 @@ function mdIconDirective($mdIcon, $mdTheming, $mdAria ) {
     function prepareForFontIcon() {
       if (!scope.svgIcon && !scope.svgSrc) {
         if (scope.fontIcon) {
+          element.removeClass('md-font ' + lastIcon);
           element.addClass('md-font ' + scope.fontIcon);
+
+          lastIcon = scope.fontIcon;
         }
-        element.addClass($mdIcon.fontSet(scope.fontSet));
+
+        var fontSet = $mdIcon.fontSet(scope.fontSet);
+
+        if (lastSet !== fontSet) {
+          element.removeClass(lastSet);
+          element.addClass(fontSet);
+
+          lastSet = fontSet;
+        }
       }
     }
   }
